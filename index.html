@@ -209,43 +209,25 @@ nav.nav-solid .nav-divider { background: var(--crema-oscuro); }
 .brand-logo {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
   text-decoration: none;
   transition: opacity 0.2s ease, transform 0.15s ease;
 }
 .brand-logo:hover { opacity: 0.78; transform: translateY(-1px); }
-.brand-rappi {
-  font-family: 'Pacifico', cursive;
-  font-size: 1.05rem;
-  color: white;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.25);
+.brand-logo img {
+  display: block;
+  height: 16px;
+  width: auto;
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.25));
 }
-.brand-pedidosya { font-weight: 800; font-size: 0.86rem; color: white; letter-spacing: 0.2px; text-shadow: 0 1px 6px rgba(0,0,0,0.25); }
-.py-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 15px;
-  height: 15px;
-  border-radius: 4px;
-  background: white;
-  color: #FF0050;
-  font-size: 0.6rem;
-  font-weight: 900;
-  font-style: normal;
-  flex-shrink: 0;
-}
-.brand-logo-lg .brand-rappi, .brand-logo-lg.brand-rappi { font-size: 1.4rem; }
-.brand-logo-lg .brand-pedidosya, .brand-logo-lg.brand-pedidosya { font-size: 1.05rem; }
-.brand-logo-lg .py-badge { width: 19px; height: 19px; font-size: 0.72rem; border-radius: 5px; }
+.brand-logo-lg img { height: 24px; }
+.footer-col .brand-logo img { height: 17px; }
 
-/* readable variants on light backgrounds */
-.info-card .brand-rappi { color: #FF441F; text-shadow: none; }
-.info-card .brand-pedidosya { color: #FF0050; text-shadow: none; }
-.info-card .py-badge { background: #FF0050; color: white; }
-nav.nav-solid .brand-rappi { color: #FF441F; text-shadow: none; }
-nav.nav-solid .brand-pedidosya { color: #FF0050; text-shadow: none; }
-nav.nav-solid .py-badge { background: #FF0050; color: white; }
+/* on light backgrounds, render logos as dark silhouettes so they stay legible */
+.info-card .brand-logo img,
+nav.nav-solid .brand-logo img {
+  filter: brightness(0);
+  opacity: 0.82;
+}
 
 main { max-width: 1080px; margin: 0 auto; padding: 90px 20px 56px; }
 section { margin-bottom: 70px; }
@@ -680,8 +662,8 @@ footer {
   <a href="#info">Info</a>
   <a href="#contacto">Contacto</a>
   <span class="nav-divider"></span>
-  <a class="brand-logo brand-rappi" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener">Rappi</a>
-  <a class="brand-logo brand-pedidosya" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><span class="py-badge">P</span>PedidosYa</a>
+  <a class="brand-logo" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener"><img src="rappi-logo.png" alt="Rappi"></a>
+  <a class="brand-logo" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><img src="pedidosya-logo.png" alt="PedidosYa"></a>
 </nav>
 
 <main>
@@ -752,8 +734,8 @@ footer {
         <h3>Modalidad</h3>
         <p>Salón, retiro en el local<br>o envío a domicilio</p>
         <div class="delivery-badges">
-          <a class="brand-logo brand-rappi" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener">Rappi</a>
-          <a class="brand-logo brand-pedidosya" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><span class="py-badge">P</span>PedidosYa</a>
+          <a class="brand-logo" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener"><img src="rappi-logo.png" alt="Rappi"></a>
+          <a class="brand-logo" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><img src="pedidosya-logo.png" alt="PedidosYa"></a>
         </div>
       </div>
     </div>
@@ -775,8 +757,8 @@ footer {
     <div class="cta-delivery">
       <p class="cta-delivery-label">También pedís por acá</p>
       <div class="delivery-badges-lg">
-        <a class="brand-logo brand-logo-lg brand-rappi" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener">Rappi</a>
-        <a class="brand-logo brand-logo-lg brand-pedidosya" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><span class="py-badge">P</span>PedidosYa</a>
+        <a class="brand-logo brand-logo-lg" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener"><img src="rappi-logo.png" alt="Rappi"></a>
+        <a class="brand-logo brand-logo-lg" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><img src="pedidosya-logo.png" alt="PedidosYa"></a>
       </div>
     </div>
   </section>
@@ -808,8 +790,8 @@ footer {
     </div>
     <div class="footer-col">
       <h4>Delivery</h4>
-      <a class="brand-logo brand-rappi" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener">Rappi</a>
-      <a class="brand-logo brand-pedidosya" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><span class="py-badge">P</span>PedidosYa</a>
+      <a class="brand-logo" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener"><img src="rappi-logo.png" alt="Rappi"></a>
+      <a class="brand-logo" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><img src="pedidosya-logo.png" alt="PedidosYa"></a>
     </div>
   </div>
   <div class="footer-bottom">
