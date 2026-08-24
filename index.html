@@ -7,7 +7,7 @@
 <meta name="description" content="Rituals - Wraps, woks y ensaladas con información nutricional completa. Comé en el local, retirá o pedí por delivery. Aráoz 2926, Palermo, CABA.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Pacifico&display=swap" rel="stylesheet">
 <style>
 :root{
   --bordo: #60252B;
@@ -149,12 +149,12 @@ a { color: inherit; }
 }
 .hero-btn-outline:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
 .hero-btn-wpp {
-  background: #25D366;
+  background: transparent;
   color: white;
-  border: 2px solid #25D366;
-  box-shadow: 0 4px 16px rgba(37,211,102,0.4);
+  border: 2px solid rgba(255,255,255,0.7);
 }
-.hero-btn-wpp:hover { background: #1fbd5a; transform: translateY(-2px); }
+.hero-btn-wpp svg { fill: #25D366; }
+.hero-btn-wpp:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
 .scroll-hint {
   margin-top: 22px;
   display: flex;
@@ -198,6 +198,46 @@ nav.nav-solid {
 }
 nav.nav-solid a { color: var(--bordo); text-shadow: none; }
 nav.nav-solid a:hover { color: var(--bordo-oscuro); opacity: 1; }
+.nav-divider {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(255,255,255,0.35);
+}
+nav.nav-solid .nav-divider { background: var(--crema-oscuro); }
+
+/* BRAND LOGOS (Rappi / PedidosYa) */
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+.brand-logo:hover { opacity: 0.78; transform: translateY(-1px); }
+.brand-rappi {
+  font-family: 'Pacifico', cursive;
+  font-size: 1.05rem;
+  color: #FF441F;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.25);
+}
+.brand-pedidosya { font-weight: 800; font-size: 0.86rem; color: #FF0050; letter-spacing: 0.2px; text-shadow: 0 1px 6px rgba(0,0,0,0.25); }
+.py-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  background: #FF0050;
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 900;
+  font-style: normal;
+  flex-shrink: 0;
+}
+.brand-logo-lg .brand-rappi, .brand-logo-lg.brand-rappi { font-size: 1.4rem; }
+.brand-logo-lg .brand-pedidosya, .brand-logo-lg.brand-pedidosya { font-size: 1.05rem; }
+.brand-logo-lg .py-badge { width: 19px; height: 19px; font-size: 0.72rem; border-radius: 5px; }
 
 main { max-width: 1080px; margin: 0 auto; padding: 90px 20px 56px; }
 section { margin-bottom: 70px; }
@@ -544,9 +584,11 @@ footer {
   max-width: 1080px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
   gap: 32px;
 }
+.footer-col .brand-logo { display: flex; margin-bottom: 10px; }
+.footer-col .brand-pedidosya { color: #FF6B93; }
 .footer-brand .word {
   font-family: 'Anton', sans-serif;
   font-weight: 400;
@@ -587,6 +629,10 @@ footer {
   .footer-inner { grid-template-columns: 1fr 1fr; }
   .footer-brand { grid-column: 1 / -1; margin-bottom: 8px; }
 }
+@media (max-width: 420px) {
+  nav { gap: 20px; }
+  .nav-divider { display: none; }
+}
 </style>
 </head>
 <body>
@@ -626,6 +672,9 @@ footer {
   <a href="#menu">Menú</a>
   <a href="#info">Info</a>
   <a href="#contacto">Contacto</a>
+  <span class="nav-divider"></span>
+  <a class="brand-logo brand-rappi" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener">Rappi</a>
+  <a class="brand-logo brand-pedidosya" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><span class="py-badge">P</span>PedidosYa</a>
 </nav>
 
 <main>
@@ -696,8 +745,8 @@ footer {
         <h3>Modalidad</h3>
         <p>Salón, retiro en el local<br>o envío a domicilio</p>
         <div class="delivery-badges">
-          <span class="badge badge-rappi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>Rappi</span>
-          <span class="badge badge-pedidosya"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>PedidosYa</span>
+          <a class="brand-logo brand-rappi" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener">Rappi</a>
+          <a class="brand-logo brand-pedidosya" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><span class="py-badge">P</span>PedidosYa</a>
         </div>
       </div>
     </div>
@@ -719,8 +768,8 @@ footer {
     <div class="cta-delivery">
       <p class="cta-delivery-label">También pedís por acá</p>
       <div class="delivery-badges-lg">
-        <span class="badge badge-rappi badge-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>Rappi</span>
-        <span class="badge badge-pedidosya badge-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>PedidosYa</span>
+        <a class="brand-logo brand-logo-lg brand-rappi" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener">Rappi</a>
+        <a class="brand-logo brand-logo-lg brand-pedidosya" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><span class="py-badge">P</span>PedidosYa</a>
       </div>
     </div>
   </section>
@@ -749,6 +798,11 @@ footer {
       <h4>Contacto</h4>
       <a href="https://wa.me/5491172150777" target="_blank" rel="noopener">WhatsApp</a>
       <a href="https://www.instagram.com/rituals.ar/" target="_blank" rel="noopener">Instagram</a>
+    </div>
+    <div class="footer-col">
+      <h4>Delivery</h4>
+      <a class="brand-logo brand-rappi" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener">Rappi</a>
+      <a class="brand-logo brand-pedidosya" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><span class="py-badge">P</span>PedidosYa</a>
     </div>
   </div>
   <div class="footer-bottom">
