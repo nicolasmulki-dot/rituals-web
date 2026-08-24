@@ -217,10 +217,10 @@ nav.nav-solid .nav-divider { background: var(--crema-oscuro); }
 .brand-rappi {
   font-family: 'Pacifico', cursive;
   font-size: 1.05rem;
-  color: #FF441F;
+  color: white;
   text-shadow: 0 1px 6px rgba(0,0,0,0.25);
 }
-.brand-pedidosya { font-weight: 800; font-size: 0.86rem; color: #FF0050; letter-spacing: 0.2px; text-shadow: 0 1px 6px rgba(0,0,0,0.25); }
+.brand-pedidosya { font-weight: 800; font-size: 0.86rem; color: white; letter-spacing: 0.2px; text-shadow: 0 1px 6px rgba(0,0,0,0.25); }
 .py-badge {
   display: inline-flex;
   align-items: center;
@@ -228,8 +228,8 @@ nav.nav-solid .nav-divider { background: var(--crema-oscuro); }
   width: 15px;
   height: 15px;
   border-radius: 4px;
-  background: #FF0050;
-  color: white;
+  background: white;
+  color: #FF0050;
   font-size: 0.6rem;
   font-weight: 900;
   font-style: normal;
@@ -238,6 +238,14 @@ nav.nav-solid .nav-divider { background: var(--crema-oscuro); }
 .brand-logo-lg .brand-rappi, .brand-logo-lg.brand-rappi { font-size: 1.4rem; }
 .brand-logo-lg .brand-pedidosya, .brand-logo-lg.brand-pedidosya { font-size: 1.05rem; }
 .brand-logo-lg .py-badge { width: 19px; height: 19px; font-size: 0.72rem; border-radius: 5px; }
+
+/* readable variants on light backgrounds */
+.info-card .brand-rappi { color: #FF441F; text-shadow: none; }
+.info-card .brand-pedidosya { color: #FF0050; text-shadow: none; }
+.info-card .py-badge { background: #FF0050; color: white; }
+nav.nav-solid .brand-rappi { color: #FF441F; text-shadow: none; }
+nav.nav-solid .brand-pedidosya { color: #FF0050; text-shadow: none; }
+nav.nav-solid .py-badge { background: #FF0050; color: white; }
 
 main { max-width: 1080px; margin: 0 auto; padding: 90px 20px 56px; }
 section { margin-bottom: 70px; }
@@ -588,7 +596,6 @@ footer {
   gap: 32px;
 }
 .footer-col .brand-logo { display: flex; margin-bottom: 10px; }
-.footer-col .brand-pedidosya { color: #FF6B93; }
 .footer-brand .word {
   font-family: 'Anton', sans-serif;
   font-weight: 400;
