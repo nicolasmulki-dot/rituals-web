@@ -688,12 +688,8 @@ footer {
     </div>
 
     <div class="menu-cat" id="cat-postres">
-      <h3 class="menu-cat-title reveal">Postre y bebidas</h3>
-      <div class="simple-list reveal">
-        <div class="plato"><div><span class="plato-nombre">Rituals Cheesecake</span><span class="plato-desc">De dulce de leche, proteico y liviano</span></div></div>
-        <div class="plato"><div><span class="plato-nombre">Agua, soda, café</span></div></div>
-        <div class="plato"><div><span class="plato-nombre">Gaseosas / Jarra limonada</span></div></div>
-      </div>
+      <h3 class="menu-cat-title reveal">Postres</h3>
+      <div class="dish-grid" data-cat="postres"></div>
     </div>
   </section>
 
@@ -722,7 +718,7 @@ footer {
       <div class="info-card reveal">
         <div class="info-icon"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
         <h3>Horarios</h3>
-        <p>Todos los días<br>12:00–15:00 y 20:00–23:00 hs</p>
+        <p>Todos los días<br>11:30–15:00 y 19:30–23:00 hs</p>
       </div>
       <div class="info-card reveal">
         <div class="info-icon"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.36 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.34 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg></div>
@@ -776,7 +772,7 @@ footer {
       <a href="#cat-wraps">Wraps</a>
       <a href="#cat-woks">Woks</a>
       <a href="#cat-ensaladas">Ensaladas</a>
-      <a href="#cat-postres">Postres y bebidas</a>
+      <a href="#cat-postres">Postres</a>
     </div>
     <div class="footer-col">
       <h4>Marca</h4>
@@ -819,6 +815,9 @@ var DISHES = {
     {name:"Rituals", img:"rituals-bowl.jpg", price:15000, desc:"Pollo, garbanzos crunchy, vegetales salteados, maní tostado, hojas verdes, cubos de calabaza", macros:{p:54,c:55,g:17,f:14,k:586}},
     {name:"Bulk", img:"bulk.jpg", price:17000, desc:"Roast beef, cebolla, pepino y palta, fideos tirabuzón, huevo, champiñones, choclo, tomate", macros:{p:46,c:55,g:23,f:9.5,k:613}},
     {name:"Green Protein", img:"green-protein.jpg", price:14000, veggie:true, desc:"Huevo, quinoa al pesto, queso, nueces tostadas, tomate, zanahoria, hojas verdes", macros:{p:26,c:35,g:42,f:10,k:630}}
+  ],
+  postres: [
+    {name:"Rituals Cheesecake", img:"cheesecake.jpg", macros:{p:14,c:21,g:11,k:240}}
   ]
 };
 
@@ -851,10 +850,12 @@ function buildCard(d){
   name.className = 'dish-name';
   name.textContent = d.name;
   info.appendChild(name);
-  var desc = document.createElement('div');
-  desc.className = 'dish-desc';
-  desc.textContent = d.desc;
-  info.appendChild(desc);
+  if (d.desc) {
+    var desc = document.createElement('div');
+    desc.className = 'dish-desc';
+    desc.textContent = d.desc;
+    info.appendChild(desc);
+  }
   a.appendChild(info);
 
   var board = document.createElement('div');
@@ -865,7 +866,7 @@ function buildCard(d){
     {v:d.macros.g, l:'Grasas'},
     {v:d.macros.f, l:'Fibras'},
     {v:d.macros.k, l:'Kcal'}
-  ];
+  ].filter(function(s){ return s.v !== undefined; });
   stats.forEach(function(s){
     var stat = document.createElement('div');
     stat.className = 'stat';
