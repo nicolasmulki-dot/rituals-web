@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rituals — Lo que repetís, te define | CABA</title>
 <meta name="description" content="Rituals - Wraps, woks y ensaladas con información nutricional completa. Comé en el local, retirá o pedí por delivery. Aráoz 2926, Palermo, CABA.">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Pacifico&display=swap" rel="stylesheet">
@@ -31,7 +38,7 @@ a { color: inherit; }
 
 /* CUSTOM CURSOR */
 @media (pointer: fine) {
-  body, a, button { cursor: none; }
+  body, a, button, .dish-card, .cust-chip { cursor: none; }
   .cursor-dot, .cursor-ring {
     position: fixed;
     top: 0;
@@ -118,7 +125,7 @@ a { color: inherit; }
   gap: 6px;
   margin-top: 50px;
 }
-.hero-bottom img { width: 96px; height: 96px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.7); box-shadow: 0 4px 18px rgba(0,0,0,0.35); }
+.hero-bottom img { width: 168px; height: 168px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.75); box-shadow: 0 10px 32px rgba(0,0,0,0.42); }
 .hero-bottom .word { font-weight: 800; letter-spacing: 4px; font-size: 1.05rem; margin-top: 6px; }
 .hero-bottom .city { font-size: 0.72rem; letter-spacing: 3px; opacity: 0.75; text-transform: uppercase; }
 .hero-buttons {
@@ -617,17 +624,218 @@ footer {
 @media (max-width: 640px) {
   .footer-inner { grid-template-columns: 1fr 1fr; }
   .footer-brand { grid-column: 1 / -1; margin-bottom: 8px; }
+  .hero-bottom img { width: 128px; height: 128px; }
 }
 @media (max-width: 420px) {
   nav { gap: 20px; }
   .nav-divider { display: none; }
 }
+
+/* FLOATING WHATSAPP BUTTON */
+.floating-wpp {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #25D366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.28);
+  z-index: 900;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.floating-wpp svg { width: 30px; height: 30px; fill: #fff; }
+.floating-wpp:hover { transform: scale(1.08); box-shadow: 0 8px 26px rgba(0,0,0,0.34); }
+@media (max-width: 640px){
+  .floating-wpp { width: 50px; height: 50px; bottom: 16px; right: 16px; }
+  .floating-wpp svg { width: 25px; height: 25px; }
+}
+
+/* CART ICON IN NAV */
+.nav-cart {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  color: white;
+  filter: drop-shadow(0 1px 6px rgba(0,0,0,0.35));
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+.nav-cart:hover { opacity: 0.75; }
+.nav-cart svg { width: 20px; height: 20px; display: block; }
+nav.nav-solid .nav-cart { color: var(--bordo); filter: none; }
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: var(--bordo);
+  color: var(--crema);
+  font-size: 0.62rem;
+  font-weight: 800;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+}
+nav.nav-solid .cart-badge { background: var(--bordo); color: var(--crema); }
+.cart-badge.hidden { display: none; }
+
+/* CUSTOMIZE MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(42,33,31,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2100;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.customize-modal {
+  background: var(--crema);
+  border-radius: 18px;
+  max-width: 460px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 26px 24px 22px;
+  transform: translateY(16px);
+  transition: transform 0.25s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+.modal-overlay.open .customize-modal { transform: translateY(0); }
+.customize-header { display: flex; gap: 14px; align-items: center; margin-bottom: 6px; }
+.customize-header img { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
+.customize-header h3 { font-size: 1.1rem; font-weight: 800; color: var(--bordo); text-transform: uppercase; }
+.customize-header .cust-price { font-size: 0.85rem; color: var(--texto-suave); margin-top: 2px; font-weight: 700; }
+.customize-close { margin-left: auto; background: none; border: none; font-size: 1.5rem; color: var(--texto-suave); line-height: 1; padding: 4px; align-self: flex-start; }
+.cust-section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; color: var(--texto-suave); margin: 18px 0 8px; }
+.cust-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.cust-chip {
+  border: 1.5px solid var(--bordo);
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--bordo);
+  color: var(--crema);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.cust-chip.off { background: transparent; color: var(--texto-suave); border-color: var(--crema-oscuro); text-decoration: line-through; }
+.cust-extra-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--crema-oscuro);
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+.cust-extra-row:last-child { border-bottom: none; }
+.cust-extra-row .cext-name { display: flex; align-items: center; gap: 9px; }
+.cust-extra-row input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--bordo); }
+.cust-extra-row .cext-price { color: var(--texto-suave); font-weight: 700; font-size: 0.8rem; white-space: nowrap; }
+.cust-note-row { display: flex; align-items: center; gap: 9px; margin-top: 16px; font-size: 0.86rem; }
+.cust-note-row input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--bordo); }
+.cust-qty { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
+.cust-qty button {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1.5px solid var(--bordo);
+  background: none; color: var(--bordo);
+  font-size: 1.1rem; font-weight: 800;
+}
+.cust-qty span { font-weight: 800; font-size: 1rem; min-width: 20px; text-align: center; }
+.cust-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 22px; gap: 12px; flex-wrap: wrap; }
+.cust-total { font-weight: 800; font-size: 1.05rem; color: var(--bordo); }
+.cust-add-btn {
+  background: var(--bordo); color: var(--crema); border: none; border-radius: 30px;
+  padding: 13px 24px; font-weight: 800; font-size: 0.78rem; text-transform: uppercase;
+  letter-spacing: 0.5px; transition: background 0.15s ease, transform 0.15s ease;
+}
+.cust-add-btn:hover { background: var(--bordo-oscuro); transform: translateY(-2px); }
+
+/* CART DRAWER */
+.drawer-overlay {
+  position: fixed; inset: 0; background: rgba(42,33,31,0.5);
+  z-index: 1999; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+}
+.drawer-overlay.open { opacity: 1; pointer-events: auto; }
+.cart-drawer {
+  position: fixed; top: 0; right: 0; height: 100%; width: 380px; max-width: 92vw;
+  background: var(--crema); z-index: 2000; box-shadow: -8px 0 30px rgba(0,0,0,0.25);
+  display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease;
+}
+.cart-drawer.open { transform: translateX(0); }
+.cart-drawer-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 22px 14px; border-bottom: 1px solid var(--crema-oscuro); }
+.cart-drawer-header h3 { font-size: 1.1rem; font-weight: 800; color: var(--bordo); text-transform: uppercase; }
+.drawer-close { background: none; border: none; font-size: 1.6rem; color: var(--texto-suave); line-height: 1; }
+.cart-items { flex: 1; overflow-y: auto; padding: 6px 22px; }
+.cart-empty { text-align: center; color: var(--texto-suave); padding: 60px 10px; font-size: 0.9rem; line-height: 1.6; }
+.cart-item { display: flex; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--crema-oscuro); }
+.cart-item img { width: 54px; height: 54px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.cart-item-body { flex: 1; min-width: 0; }
+.cart-item-name { font-weight: 800; font-size: 0.88rem; display: flex; justify-content: space-between; gap: 8px; }
+.cart-item-mods { font-size: 0.74rem; color: var(--texto-suave); margin-top: 3px; line-height: 1.45; }
+.cart-item-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.cart-item-qty { font-size: 0.76rem; font-weight: 700; color: var(--texto-suave); }
+.cart-item-remove { background: none; border: none; color: var(--texto-suave); font-size: 0.72rem; text-decoration: underline; padding: 0; margin-top: 6px; }
+.cart-drawer-footer { padding: 18px 22px 22px; border-top: 1px solid var(--crema-oscuro); }
+.cart-total-row { display: flex; justify-content: space-between; font-weight: 800; font-size: 1.05rem; color: var(--bordo); margin-bottom: 14px; }
+.cart-order-btn {
+  width: 100%; background: #25D366; color: #fff; border: none; border-radius: 30px;
+  padding: 14px; font-weight: 800; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.cart-order-btn:hover { background: #1fa855; transform: translateY(-2px); }
+.cart-order-btn:disabled { opacity: 0.5; transform: none; }
+@media (max-width: 480px) { .cart-drawer { width: 100%; max-width: 100%; } }
 </style>
 </head>
 <body>
 
 <div class="cursor-dot" id="cursorDot"></div>
 <div class="cursor-ring" id="cursorRing"></div>
+
+<a class="floating-wpp" href="https://wa.me/5491172150777" target="_blank" rel="noopener" aria-label="Chatear por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4c-4.36 0-7.9 3.53-7.9 7.9 0 1.39.36 2.75 1.05 3.95L4 20l4.27-1.12a7.9 7.9 0 0 0 3.78.96h.01c4.36 0 7.9-3.53 7.9-7.9 0-2.11-.82-4.09-2.36-5.62Zm-5.55 12.16h-.01a6.56 6.56 0 0 1-3.35-.92l-.24-.14-2.53.66.68-2.47-.16-.25a6.57 6.57 0 0 1-1.01-3.5c0-3.63 2.96-6.58 6.6-6.58 1.76 0 3.42.69 4.66 1.94a6.55 6.55 0 0 1 1.93 4.65c0 3.63-2.96 6.61-6.57 6.61Zm3.6-4.93c-.2-.1-1.17-.58-1.35-.64-.18-.07-.31-.1-.44.1-.13.2-.5.64-.62.77-.11.13-.23.14-.42.05-.2-.1-.83-.31-1.58-.98-.58-.52-.98-1.16-1.09-1.36-.11-.2-.01-.3.09-.4.09-.09.2-.23.3-.35.1-.11.13-.2.2-.33.07-.13.03-.25-.02-.35-.05-.1-.44-1.06-.6-1.45-.16-.38-.32-.33-.44-.33h-.38c-.13 0-.34.05-.52.25-.18.2-.68.66-.68 1.62 0 .96.7 1.88.8 2.01.1.13 1.37 2.1 3.33 2.94.46.2.83.32 1.11.41.47.15.9.13 1.24.08.38-.06 1.17-.48 1.33-.94.16-.46.16-.86.11-.94-.05-.08-.18-.13-.38-.23Z"/></svg>
+</a>
+
+<div class="modal-overlay" id="customizeOverlay">
+  <div class="customize-modal" id="customizeModal"></div>
+</div>
+
+<div class="drawer-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-drawer-header">
+    <h3>Tu pedido</h3>
+    <button class="drawer-close" type="button" id="cartClose">&times;</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-drawer-footer">
+    <div class="cart-total-row"><span>Total</span><span id="cartTotalAmt">$0</span></div>
+    <button class="cart-order-btn" type="button" id="cartOrderBtn" disabled>
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4c-4.36 0-7.9 3.53-7.9 7.9 0 1.39.36 2.75 1.05 3.95L4 20l4.27-1.12a7.9 7.9 0 0 0 3.78.96h.01c4.36 0 7.9-3.53 7.9-7.9 0-2.11-.82-4.09-2.36-5.62Z"/></svg>
+      Realizar pedido
+    </button>
+  </div>
+</aside>
 
 <section class="hero">
   <div class="hero-bg"></div>
@@ -664,13 +872,17 @@ footer {
   <span class="nav-divider"></span>
   <a class="brand-logo" href="https://www.rappi.com.ar/restaurantes/266464-rituals" target="_blank" rel="noopener"><img src="rappi-logo.png" alt="Rappi"></a>
   <a class="brand-logo" href="https://www.pedidosya.com.ar/restaurantes/buenos-aires/rituals-2e12f8c5-3859-458d-9f7a-e20821934138-menu?origin=shop_list" target="_blank" rel="noopener"><img src="pedidosya-logo.png" alt="PedidosYa"></a>
+  <button class="nav-cart" type="button" id="cartToggle" aria-label="Ver carrito">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span class="cart-badge hidden" id="cartBadge">0</span>
+  </button>
 </nav>
 
 <main>
 
   <section id="menu">
     <h2 class="section-title reveal">Menú</h2>
-    <p class="section-sub reveal">Cada plato con su información nutricional completa. Tocá un plato para pedirlo directo por WhatsApp.</p>
+    <p class="section-sub reveal">Cada plato con su información nutricional completa. Tocá un plato para personalizarlo y sumarlo a tu pedido.</p>
 
     <div class="menu-cat" id="cat-wraps">
       <h3 class="menu-cat-title reveal">Wraps</h3>
@@ -799,21 +1011,21 @@ footer {
 <script>
 var DISHES = {
   wraps: [
-    {name:"Rituals MC", img:"rituals-mc.jpg", price:17000, desc:"Carne desmechada, queso, pepinillos, cebolla, salsa rituals proteica", macros:{p:60,c:30,g:23,f:5,k:591}},
-    {name:"Chipa Wrap", img:"chipa-wrap.jpg", price:19500, desc:"Pollo, champiñones, cebolla, espinaca, cream cheese de verdeo", macros:{p:51,c:76,g:20,f:3,k:688}},
-    {name:"Iron Beef", img:"iron-beef.jpg", price:17000, desc:"Carne desmechada, vegetales salteados, dip de palta", macros:{p:48,c:48,g:21,f:11,k:582}},
-    {name:"Big Cesar", img:"big-cesar.jpg", price:16000, desc:"Pollo, queso, almendras, aderezo césar proteico, croutons integrales, lechuga", macros:{p:40,c:10,g:22,f:4,k:398}},
+    {name:"Rituals MC", img:"rituals-mc.jpg", price:17000, protein:"carne", desc:"Carne desmechada, queso, pepinillos, cebolla, salsa rituals proteica", macros:{p:60,c:30,g:23,f:5,k:591}},
+    {name:"Chipa Wrap", img:"chipa-wrap.jpg", price:19500, protein:"pollo", desc:"Pollo, champiñones, cebolla, espinaca, cream cheese de verdeo", macros:{p:51,c:76,g:20,f:3,k:688}},
+    {name:"Iron Beef", img:"iron-beef.jpg", price:17000, protein:"carne", desc:"Carne desmechada, vegetales salteados, dip de palta", macros:{p:48,c:48,g:21,f:11,k:582}},
+    {name:"Big Cesar", img:"big-cesar.jpg", price:16000, protein:"pollo", desc:"Pollo, queso, almendras, aderezo césar proteico, croutons integrales, lechuga", macros:{p:40,c:10,g:22,f:4,k:398}},
     {name:"Vegan Power", img:"vegan-power.jpg", price:14000, veggie:true, desc:"Lentejas especiadas, hummus de garbanzos, tomate, espinaca, salsa criolla, nueces", macros:{p:26,c:100,g:23,f:15,k:657}}
   ],
   woks: [
-    {name:"Criollo Umami", img:"criollo-umami.jpg", price:16000, desc:"Roast beef, arroz yamaní, maní tostado, verduras salteadas, brotes de soja", macros:{p:54,c:66,g:24,f:12,k:694}},
-    {name:"Golden Chicken", img:"golden-chicken.jpg", price:15000, desc:"Pollo, arroz yamaní, maní tostado, verduras salteadas, brotes de soja", macros:{p:53,c:63,g:18,f:11,k:630}},
+    {name:"Criollo Umami", img:"criollo-umami.jpg", price:16000, protein:"carne", desc:"Roast beef, arroz yamaní, maní tostado, verduras salteadas, brotes de soja", macros:{p:54,c:66,g:24,f:12,k:694}},
+    {name:"Golden Chicken", img:"golden-chicken.jpg", price:15000, protein:"pollo", desc:"Pollo, arroz yamaní, maní tostado, verduras salteadas, brotes de soja", macros:{p:53,c:63,g:18,f:11,k:630}},
     {name:"Asian Veggie", img:"asian-veggie.jpg", price:14000, desc:"Huevo, arroz yamaní, maní tostado, verduras salteadas, soja texturizada especiada", macros:{p:47,c:76,g:21,f:13,k:677}}
   ],
   ensaladas: [
-    {name:"César", img:"cesar.jpg", price:16000, desc:"Pollo, queso en hebras, almendras tostadas, aderezo césar proteico, croutons, lechuga", macros:{p:58,c:20,g:33,f:7,k:611}},
-    {name:"Rituals", img:"rituals-bowl.jpg", price:15000, desc:"Pollo, garbanzos crunchy, vegetales salteados, maní tostado, hojas verdes, cubos de calabaza", macros:{p:54,c:55,g:17,f:14,k:586}},
-    {name:"Bulk", img:"bulk.jpg", price:17000, desc:"Roast beef, cebolla, pepino y palta, fideos tirabuzón, huevo, champiñones, choclo, tomate", macros:{p:46,c:55,g:23,f:9.5,k:613}},
+    {name:"César", img:"cesar.jpg", price:16000, protein:"pollo", desc:"Pollo, queso en hebras, almendras tostadas, aderezo césar proteico, croutons, lechuga", macros:{p:58,c:20,g:33,f:7,k:611}},
+    {name:"Rituals", img:"rituals-bowl.jpg", price:15000, protein:"pollo", desc:"Pollo, garbanzos crunchy, vegetales salteados, maní tostado, hojas verdes, cubos de calabaza", macros:{p:54,c:55,g:17,f:14,k:586}},
+    {name:"Bulk", img:"bulk.jpg", price:17000, protein:"carne", desc:"Carne desmechada, palta y cebolla, arroz yamaní, huevo, zanahoria, choclo, tomate y pepino", macros:{p:46,c:55,g:23,f:9.5,k:613}},
     {name:"Green Protein", img:"green-protein.jpg", price:14000, veggie:true, desc:"Huevo, quinoa al pesto, queso, nueces tostadas, tomate, zanahoria, hojas verdes", macros:{p:26,c:35,g:42,f:10,k:630}}
   ],
   postres: [
@@ -823,12 +1035,28 @@ var DISHES = {
 
 function fmtPrice(n){ return '$' + n.toLocaleString('es-AR'); }
 
+var EXTRAS = [
+  {name:"Extra carne", price:3000, only:"carne"},
+  {name:"Extra pollo", price:2500, only:"pollo"},
+  {name:"Extra champiñones", price:3500},
+  {name:"Extra huevo", price:1000},
+  {name:"Extra lenteja", price:1000},
+  {name:"Extra palta", price:2000},
+  {name:"Extra queso", price:2500},
+  {name:"Extra salsa", price:1500},
+  {name:"Extra soja", price:1000}
+];
+
+function dishExtras(d){
+  return EXTRAS.filter(function(e){ return !e.only || e.only === d.protein; });
+}
+
 function buildCard(d){
-  var a = document.createElement('a');
+  var hasPrice = typeof d.price === 'number';
+  var a = document.createElement('div');
   a.className = 'dish-card';
-  a.href = 'https://wa.me/5491172150777?text=' + encodeURIComponent('Hola! Quiero pedir: ' + d.name);
-  a.target = '_blank';
-  a.rel = 'noopener';
+  a.setAttribute('role', 'button');
+  a.tabIndex = 0;
 
   var photoWrap = document.createElement('div');
   photoWrap.className = 'dish-photo-wrap';
@@ -885,7 +1113,17 @@ function buildCard(d){
 
   var hint = document.createElement('div');
   hint.className = 'dish-order-hint';
-  hint.innerHTML = 'Pedir por WhatsApp <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  if (hasPrice){
+    hint.innerHTML = 'Personalizar y agregar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+    a.addEventListener('click', function(){ openCustomize(d); });
+    a.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openCustomize(d); } });
+  } else {
+    hint.innerHTML = 'Pedir por WhatsApp <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+    a.addEventListener('click', function(){
+      window.open('https://wa.me/5491172150777?text=' + encodeURIComponent('Hola! Quiero pedir: ' + d.name), '_blank');
+    });
+    a.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); a.click(); } });
+  }
   a.appendChild(hint);
 
   return a;
@@ -898,6 +1136,218 @@ Object.keys(DISHES).forEach(function(cat){
     container.appendChild(buildCard(d));
   });
 });
+
+var CART = [];
+
+function loadCart(){
+  try{
+    var raw = localStorage.getItem('ritualsCart');
+    CART = raw ? JSON.parse(raw) : [];
+  } catch(e){ CART = []; }
+}
+function saveCart(){
+  try{ localStorage.setItem('ritualsCart', JSON.stringify(CART)); } catch(e){}
+}
+function cartTotal(){
+  return CART.reduce(function(s, it){ return s + it.unitPrice * it.qty; }, 0);
+}
+function renderCartBadge(){
+  var badge = document.getElementById('cartBadge');
+  if(!badge) return;
+  var count = CART.reduce(function(s, it){ return s + it.qty; }, 0);
+  badge.textContent = count;
+  badge.classList.toggle('hidden', count === 0);
+}
+
+var customizeOverlay = document.getElementById('customizeOverlay');
+var customizeModal = document.getElementById('customizeModal');
+
+function closeCustomize(){
+  customizeOverlay.classList.remove('open');
+}
+customizeOverlay.addEventListener('click', function(e){
+  if(e.target === customizeOverlay) closeCustomize();
+});
+
+function openCustomize(d){
+  var ingredients = d.desc ? d.desc.split(',').map(function(s){ return s.trim(); }) : [];
+  var extras = dishExtras(d);
+  var state = {
+    included: ingredients.map(function(){ return true; }),
+    extras: extras.map(function(){ return false; }),
+    spicyFree: false,
+    qty: 1
+  };
+
+  function subtotal(){
+    var extraSum = 0;
+    extras.forEach(function(e, i){ if(state.extras[i]) extraSum += e.price; });
+    return (d.price + extraSum) * state.qty;
+  }
+
+  function render(){
+    var html = '';
+    html += '<div class="customize-header"><img src="' + d.img + '" alt="' + d.name + '">';
+    html += '<div><h3>' + d.name + '</h3><div class="cust-price">' + fmtPrice(d.price) + '</div></div>';
+    html += '<button class="customize-close" type="button" id="custClose">&times;</button></div>';
+
+    if(ingredients.length){
+      html += '<div class="cust-section-title">Ingredientes · tocá para quitar</div><div class="cust-chips" id="custChips">';
+      ingredients.forEach(function(ing, i){
+        html += '<span class="cust-chip" data-i="' + i + '">' + ing + '</span>';
+      });
+      html += '</div>';
+    }
+
+    if(extras.length){
+      html += '<div class="cust-section-title">Extras</div><div id="custExtras">';
+      extras.forEach(function(e, i){
+        html += '<label class="cust-extra-row"><span class="cext-name"><input type="checkbox" data-i="' + i + '"> ' + e.name + '</span><span class="cext-price">+' + fmtPrice(e.price) + '</span></label>';
+      });
+      html += '</div>';
+    }
+
+    html += '<label class="cust-note-row"><input type="checkbox" id="custSpicy"> Sin picante</label>';
+    html += '<div class="cust-qty"><button type="button" id="qtyMinus">−</button><span id="qtyVal">' + state.qty + '</span><button type="button" id="qtyPlus">+</button></div>';
+    html += '<div class="cust-footer"><span class="cust-total" id="custTotal">' + fmtPrice(subtotal()) + '</span><button class="cust-add-btn" type="button" id="custAddBtn">Agregar al carrito</button></div>';
+
+    customizeModal.innerHTML = html;
+
+    customizeModal.querySelector('#custClose').addEventListener('click', closeCustomize);
+
+    customizeModal.querySelectorAll('.cust-chip').forEach(function(chip){
+      chip.addEventListener('click', function(){
+        var i = +chip.dataset.i;
+        state.included[i] = !state.included[i];
+        chip.classList.toggle('off', !state.included[i]);
+      });
+    });
+
+    customizeModal.querySelectorAll('#custExtras input[type=checkbox]').forEach(function(cb){
+      cb.addEventListener('change', function(){
+        var i = +cb.dataset.i;
+        state.extras[i] = cb.checked;
+        customizeModal.querySelector('#custTotal').textContent = fmtPrice(subtotal());
+      });
+    });
+
+    customizeModal.querySelector('#custSpicy').addEventListener('change', function(e){
+      state.spicyFree = e.target.checked;
+    });
+
+    customizeModal.querySelector('#qtyMinus').addEventListener('click', function(){
+      if(state.qty > 1){
+        state.qty--;
+        customizeModal.querySelector('#qtyVal').textContent = state.qty;
+        customizeModal.querySelector('#custTotal').textContent = fmtPrice(subtotal());
+      }
+    });
+    customizeModal.querySelector('#qtyPlus').addEventListener('click', function(){
+      state.qty++;
+      customizeModal.querySelector('#qtyVal').textContent = state.qty;
+      customizeModal.querySelector('#custTotal').textContent = fmtPrice(subtotal());
+    });
+
+    customizeModal.querySelector('#custAddBtn').addEventListener('click', function(){
+      var removed = ingredients.filter(function(ing, i){ return !state.included[i]; });
+      var chosenExtras = extras.filter(function(e, i){ return state.extras[i]; });
+      CART.push({
+        name: d.name,
+        img: d.img,
+        basePrice: d.price,
+        qty: state.qty,
+        removed: removed,
+        extras: chosenExtras,
+        spicyFree: state.spicyFree,
+        unitPrice: d.price + chosenExtras.reduce(function(s, e){ return s + e.price; }, 0)
+      });
+      saveCart();
+      renderCartBadge();
+      closeCustomize();
+      openCartDrawer();
+    });
+  }
+
+  render();
+  customizeOverlay.classList.add('open');
+}
+
+var cartDrawer = document.getElementById('cartDrawer');
+var cartOverlay = document.getElementById('cartOverlay');
+var cartItemsEl = document.getElementById('cartItems');
+
+function openCartDrawer(){
+  renderCartDrawer();
+  cartDrawer.classList.add('open');
+  cartOverlay.classList.add('open');
+}
+function closeCartDrawer(){
+  cartDrawer.classList.remove('open');
+  cartOverlay.classList.remove('open');
+}
+
+function renderCartDrawer(){
+  if(!CART.length){
+    cartItemsEl.innerHTML = '<div class="cart-empty">Tu carrito está vacío.<br>Elegí un plato del menú para empezar.</div>';
+  } else {
+    cartItemsEl.innerHTML = CART.map(function(it, idx){
+      var mods = [];
+      if(it.removed.length) mods.push('Sin: ' + it.removed.join(', '));
+      if(it.extras.length) mods.push('Extras: ' + it.extras.map(function(e){ return e.name; }).join(', '));
+      if(it.spicyFree) mods.push('Sin picante');
+      return '<div class="cart-item">' +
+        '<img src="' + it.img + '" alt="' + it.name + '">' +
+        '<div class="cart-item-body">' +
+          '<div class="cart-item-name"><span>' + it.name + '</span><span>' + fmtPrice(it.unitPrice * it.qty) + '</span></div>' +
+          (mods.length ? '<div class="cart-item-mods">' + mods.join(' · ') + '</div>' : '') +
+          '<div class="cart-item-bottom"><span class="cart-item-qty">Cantidad: ' + it.qty + '</span></div>' +
+          '<button class="cart-item-remove" type="button" data-idx="' + idx + '">Quitar</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    cartItemsEl.querySelectorAll('.cart-item-remove').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        CART.splice(+btn.dataset.idx, 1);
+        saveCart();
+        renderCartDrawer();
+        renderCartBadge();
+      });
+    });
+  }
+  document.getElementById('cartTotalAmt').textContent = fmtPrice(cartTotal());
+  document.getElementById('cartOrderBtn').disabled = CART.length === 0;
+}
+
+function buildOrderMessage(){
+  var lines = ['¡Hola! Quiero hacer este pedido:', ''];
+  CART.forEach(function(it, i){
+    lines.push((i + 1) + ') ' + it.name + ' x' + it.qty);
+    if(it.removed.length) lines.push('   Sin: ' + it.removed.join(', '));
+    if(it.extras.length) lines.push('   Extras: ' + it.extras.map(function(e){ return e.name + ' (+' + fmtPrice(e.price) + ')'; }).join(', '));
+    if(it.spicyFree) lines.push('   Sin picante');
+    lines.push('   Subtotal: ' + fmtPrice(it.unitPrice * it.qty));
+    lines.push('');
+  });
+  lines.push('Total: ' + fmtPrice(cartTotal()));
+  return lines.join('\n');
+}
+
+document.getElementById('cartToggle').addEventListener('click', openCartDrawer);
+document.getElementById('cartClose').addEventListener('click', closeCartDrawer);
+cartOverlay.addEventListener('click', closeCartDrawer);
+document.getElementById('cartOrderBtn').addEventListener('click', function(){
+  if(!CART.length) return;
+  var msg = buildOrderMessage();
+  window.open('https://wa.me/5491172150777?text=' + encodeURIComponent(msg), '_blank');
+  CART = [];
+  saveCart();
+  renderCartBadge();
+  renderCartDrawer();
+  closeCartDrawer();
+});
+
+loadCart();
+renderCartBadge();
 
 function animateNumber(el){
   var target = parseFloat(el.dataset.target);
