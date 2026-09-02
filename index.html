@@ -805,6 +805,21 @@ nav.nav-solid .cart-badge { background: var(--bordo); color: var(--crema); }
 }
 .cart-order-btn:hover { background: #1fa855; transform: translateY(-2px); }
 .cart-order-btn:disabled { opacity: 0.5; transform: none; }
+.cart-continue-btn {
+  width: 100%;
+  background: transparent;
+  color: var(--bordo);
+  border: 1.5px solid var(--bordo);
+  border-radius: 30px;
+  padding: 12px;
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.cart-continue-btn:hover { background: rgba(96,37,43,0.08); transform: translateY(-1px); }
 @media (max-width: 480px) { .cart-drawer { width: 100%; max-width: 100%; } }
 </style>
 </head>
@@ -829,6 +844,7 @@ nav.nav-solid .cart-badge { background: var(--bordo); color: var(--crema); }
   </div>
   <div class="cart-items" id="cartItems"></div>
   <div class="cart-drawer-footer">
+    <button class="cart-continue-btn" type="button" id="cartContinueBtn">Seguir agregando productos</button>
     <div class="cart-total-row"><span>Total</span><span id="cartTotalAmt">$0</span></div>
     <button class="cart-order-btn" type="button" id="cartOrderBtn" disabled>
       <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4c-4.36 0-7.9 3.53-7.9 7.9 0 1.39.36 2.75 1.05 3.95L4 20l4.27-1.12a7.9 7.9 0 0 0 3.78.96h.01c4.36 0 7.9-3.53 7.9-7.9 0-2.11-.82-4.09-2.36-5.62Z"/></svg>
@@ -1333,6 +1349,7 @@ function buildOrderMessage(){
 }
 
 document.getElementById('cartToggle').addEventListener('click', openCartDrawer);
+document.getElementById('cartContinueBtn').addEventListener('click', closeCartDrawer);
 document.getElementById('cartClose').addEventListener('click', closeCartDrawer);
 cartOverlay.addEventListener('click', closeCartDrawer);
 document.getElementById('cartOrderBtn').addEventListener('click', function(){
