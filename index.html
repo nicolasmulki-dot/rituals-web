@@ -81,9 +81,11 @@ a { color: inherit; }
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url('https://images.unsplash.com/photo-1762709753393-a2937622949e?w=1600&q=75&auto=format&fit=crop');
-  background-size: cover;
-  background-position: center 30%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  background: #14080a;
   filter: grayscale(1) contrast(1.15) brightness(0.55);
   transform: scale(1.08);
   z-index: 0;
@@ -854,7 +856,9 @@ nav.nav-solid .cart-badge { background: var(--bordo); color: var(--crema); }
 </aside>
 
 <section class="hero">
-  <div class="hero-bg"></div>
+  <video class="hero-bg" autoplay muted loop playsinline preload="auto" poster="hero-poster.jpg">
+    <source src="hero-video.mp4" type="video/mp4">
+  </video>
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <p class="hero-top">Lo que repetís, te define</p>
