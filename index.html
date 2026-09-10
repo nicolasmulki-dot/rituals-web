@@ -1397,29 +1397,34 @@ function renderCartDrawer(){
 }
 
 function buildOrderMessage(fulfillment){
-  var lines = ['¡Hola! Quiero hacer este pedido:', ''];
+  var DIVIDER = '──────────────';
+  var lines = ['*PEDIDO — RITUALS*', DIVIDER, ''];
   CART.forEach(function(it, i){
     lines.push((i + 1) + ') ' + it.name + ' x' + it.qty);
+    it.extras.forEach(function(e){
+      lines.push('   + ' + e.name + ' (' + fmtPrice(e.price) + ')');
+    });
     if(it.removed.length) lines.push('   Sin: ' + it.removed.join(', '));
-    if(it.extras.length) lines.push('   Extras: ' + it.extras.map(function(e){ return e.name + ' (+' + fmtPrice(e.price) + ')'; }).join(', '));
     if(it.spicyFree) lines.push('   Sin picante');
-    lines.push('   Subtotal: ' + fmtPrice(it.unitPrice * it.qty));
     lines.push('');
   });
 
+  lines.push(DIVIDER);
   if(fulfillment && fulfillment.type === 'pickup'){
-    lines.push('Retiro en el local: ' + STORE_ADDRESS);
+    lines.push('*Retiro en el local*');
+    lines.push(STORE_ADDRESS);
   } else if(fulfillment && fulfillment.type === 'delivery'){
     var addr = fulfillment.address || {};
-    lines.push('Envío a domicilio (costo adicional a confirmar con el local)');
-    lines.push('Dirección: ' + addr.street);
-    if(addr.floor) lines.push('Piso/Depto: ' + addr.floor);
+    lines.push('*Envío a domicilio* (costo a confirmar)');
+    var addrLine = addr.street;
+    if(addr.floor) addrLine += ', ' + addr.floor;
+    lines.push(addrLine);
     if(addr.notes) lines.push('Referencia: ' + addr.notes);
   }
   lines.push('');
 
   var total = cartTotal();
-  lines.push('Total: ' + fmtPrice(total));
+  lines.push('*Total: ' + fmtPrice(total) + '*');
   return lines.join('\n');
 }
 
