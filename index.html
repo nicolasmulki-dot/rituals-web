@@ -772,6 +772,58 @@ nav.nav-solid .cart-badge { background: var(--bordo); color: var(--crema); }
 }
 .cust-add-btn:hover { background: var(--bordo-oscuro); transform: translateY(-2px); }
 
+/* FULFILLMENT MODAL */
+.fulfill-modal {
+  background: var(--crema);
+  border-radius: 18px;
+  max-width: 440px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 26px 24px 22px;
+  transform: translateY(16px);
+  transition: transform 0.25s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+.modal-overlay.open .fulfill-modal { transform: translateY(0); }
+.fulfill-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.fulfill-header h3 { font-size: 1.1rem; font-weight: 800; color: var(--bordo); text-transform: uppercase; }
+.fulfill-options { display: flex; gap: 10px; margin-top: 18px; }
+.fulfill-opt {
+  flex: 1; border: 1.5px solid var(--crema-oscuro); border-radius: 14px;
+  padding: 16px 10px; text-align: center; background: transparent; color: var(--texto);
+  transition: all 0.15s ease;
+}
+.fulfill-opt svg { width: 22px; height: 22px; stroke: var(--bordo); margin-bottom: 8px; }
+.fulfill-opt .fopt-title { font-weight: 800; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.3px; }
+.fulfill-opt .fopt-sub { font-size: 0.74rem; color: var(--texto-suave); margin-top: 3px; }
+.fulfill-opt.active { border-color: var(--bordo); background: rgba(96,37,43,0.06); }
+.fulfill-detail { margin-top: 18px; }
+.fulfill-pickup-box {
+  background: var(--crema-oscuro); border-radius: 12px; padding: 14px 16px; font-size: 0.86rem; line-height: 1.55;
+}
+.fulfill-pickup-box strong { display: block; color: var(--bordo); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.fulfill-field { margin-bottom: 12px; }
+.fulfill-field label { display: block; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: var(--texto-suave); margin-bottom: 5px; }
+.fulfill-field input, .fulfill-field textarea {
+  width: 100%; border: 1.5px solid var(--crema-oscuro); border-radius: 10px; padding: 10px 12px;
+  font-family: inherit; font-size: 0.86rem; color: var(--texto); background: #fff;
+}
+.fulfill-field input:focus, .fulfill-field textarea:focus { outline: none; border-color: var(--bordo); }
+.fulfill-field textarea { resize: vertical; min-height: 52px; }
+.fulfill-error { color: #b3261e; font-size: 0.76rem; margin-top: -4px; margin-bottom: 10px; display: none; }
+.fulfill-error.show { display: block; }
+.fulfill-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; gap: 12px; flex-wrap: wrap; }
+.fulfill-total { font-weight: 800; font-size: 1.05rem; color: var(--bordo); }
+.fulfill-confirm-btn {
+  background: #25D366; color: #fff; border: none; border-radius: 30px;
+  padding: 13px 22px; font-weight: 800; font-size: 0.78rem; text-transform: uppercase;
+  letter-spacing: 0.5px; transition: background 0.15s ease, transform 0.15s ease;
+}
+.fulfill-confirm-btn:hover { background: #1fa855; transform: translateY(-2px); }
+.fulfill-confirm-btn:disabled { opacity: 0.5; transform: none; }
+.fulfill-close { background: none; border: none; font-size: 1.5rem; color: var(--texto-suave); line-height: 1; padding: 4px; }
+
 /* CART DRAWER */
 .drawer-overlay {
   position: fixed; inset: 0; background: rgba(42,33,31,0.5);
@@ -854,6 +906,10 @@ nav.nav-solid .cart-badge { background: var(--bordo); color: var(--crema); }
     </button>
   </div>
 </aside>
+
+<div class="modal-overlay" id="fulfillOverlay">
+  <div class="fulfill-modal" id="fulfillModal"></div>
+</div>
 
 <section class="hero">
   <video class="hero-bg" autoplay muted loop playsinline preload="auto" poster="hero-poster.jpg">
@@ -1056,9 +1112,9 @@ var DISHES = {
 function fmtPrice(n){ return '$' + n.toLocaleString('es-AR'); }
 
 var EXTRAS = [
-  {name:"Extra carne", price:3000, only:"carne"},
-  {name:"Extra pollo", price:2500, only:"pollo"},
-  {name:"Extra champiñones", price:3500},
+  {name:"Extra carne", price:4000, only:"carne"},
+  {name:"Extra pollo", price:3000, only:"pollo"},
+  {name:"Extra champiñones", price:4000},
   {name:"Extra huevo", price:1000},
   {name:"Extra lenteja", price:1000},
   {name:"Extra palta", price:2000},
@@ -1158,6 +1214,8 @@ Object.keys(DISHES).forEach(function(cat){
 });
 
 var CART = [];
+var DELIVERY_FEE = 3000;
+var STORE_ADDRESS = "Aráoz 2926, Palermo, Ciudad Autónoma de Buenos Aires";
 
 function loadCart(){
   try{
@@ -1338,7 +1396,7 @@ function renderCartDrawer(){
   document.getElementById('cartOrderBtn').disabled = CART.length === 0;
 }
 
-function buildOrderMessage(){
+function buildOrderMessage(fulfillment){
   var lines = ['¡Hola! Quiero hacer este pedido:', ''];
   CART.forEach(function(it, i){
     lines.push((i + 1) + ') ' + it.name + ' x' + it.qty);
@@ -1348,7 +1406,20 @@ function buildOrderMessage(){
     lines.push('   Subtotal: ' + fmtPrice(it.unitPrice * it.qty));
     lines.push('');
   });
-  lines.push('Total: ' + fmtPrice(cartTotal()));
+
+  if(fulfillment && fulfillment.type === 'pickup'){
+    lines.push('Retiro en el local: ' + STORE_ADDRESS);
+  } else if(fulfillment && fulfillment.type === 'delivery'){
+    var addr = fulfillment.address || {};
+    lines.push('Envío a domicilio (+' + fmtPrice(DELIVERY_FEE) + ')');
+    lines.push('Dirección: ' + addr.street);
+    if(addr.floor) lines.push('Piso/Depto: ' + addr.floor);
+    if(addr.notes) lines.push('Referencia: ' + addr.notes);
+  }
+  lines.push('');
+
+  var total = cartTotal() + (fulfillment && fulfillment.type === 'delivery' ? DELIVERY_FEE : 0);
+  lines.push('Total: ' + fmtPrice(total));
   return lines.join('\n');
 }
 
@@ -1358,14 +1429,90 @@ document.getElementById('cartClose').addEventListener('click', closeCartDrawer);
 cartOverlay.addEventListener('click', closeCartDrawer);
 document.getElementById('cartOrderBtn').addEventListener('click', function(){
   if(!CART.length) return;
-  var msg = buildOrderMessage();
-  window.open('https://wa.me/5491172150777?text=' + encodeURIComponent(msg), '_blank');
-  CART = [];
-  saveCart();
-  renderCartBadge();
-  renderCartDrawer();
-  closeCartDrawer();
+  openFulfillment();
 });
+
+var fulfillOverlay = document.getElementById('fulfillOverlay');
+var fulfillModal = document.getElementById('fulfillModal');
+
+function closeFulfillment(){
+  fulfillOverlay.classList.remove('open');
+}
+fulfillOverlay.addEventListener('click', function(e){
+  if(e.target === fulfillOverlay) closeFulfillment();
+});
+
+function openFulfillment(){
+  var state = { type: null, address: { street: '', floor: '', notes: '' } };
+
+  function render(){
+    var deliveryTotal = cartTotal() + DELIVERY_FEE;
+    var html = '';
+    html += '<div class="fulfill-header"><h3>¿Cómo lo recibís?</h3><button class="fulfill-close" type="button" id="fulClose">&times;</button></div>';
+    html += '<div class="fulfill-options">';
+    html += '<button type="button" class="fulfill-opt' + (state.type === 'pickup' ? ' active' : '') + '" id="fulPickupBtn">';
+    html += '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V21H3V9.5Z"/></svg>';
+    html += '<div class="fopt-title">Retiro en el local</div><div class="fopt-sub">Sin cargo extra</div></button>';
+    html += '<button type="button" class="fulfill-opt' + (state.type === 'delivery' ? ' active' : '') + '" id="fulDeliveryBtn">';
+    html += '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v8H3zM14 10h4l3 3v2h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></svg>';
+    html += '<div class="fopt-title">Delivery</div><div class="fopt-sub">+' + fmtPrice(DELIVERY_FEE) + '</div></button>';
+    html += '</div>';
+
+    html += '<div class="fulfill-detail" id="fulDetail">';
+    if(state.type === 'pickup'){
+      html += '<div class="fulfill-pickup-box"><strong>Dirección para retirar</strong>' + STORE_ADDRESS + '</div>';
+    } else if(state.type === 'delivery'){
+      html += '<div class="fulfill-field"><label>Dirección (calle y número)</label><input type="text" id="fulStreet" placeholder="Ej: Aráoz 2926" value="' + state.address.street + '"></div>';
+      html += '<div class="fulfill-field"><label>Piso / Depto (opcional)</label><input type="text" id="fulFloor" placeholder="Ej: 4to B" value="' + state.address.floor + '"></div>';
+      html += '<div class="fulfill-field"><label>Referencia (opcional)</label><textarea id="fulNotes" placeholder="Entre calles, timbre, etc.">' + state.address.notes + '</textarea></div>';
+      html += '<div class="fulfill-error" id="fulError">Completá la dirección para continuar.</div>';
+    }
+    html += '</div>';
+
+    html += '<div class="fulfill-footer"><span class="fulfill-total" id="fulTotal">' + fmtPrice(state.type === 'delivery' ? deliveryTotal : cartTotal()) + '</span>';
+    html += '<button class="fulfill-confirm-btn" type="button" id="fulConfirmBtn"' + (state.type ? '' : ' disabled') + '>Confirmar pedido</button></div>';
+
+    fulfillModal.innerHTML = html;
+
+    fulfillModal.querySelector('#fulClose').addEventListener('click', closeFulfillment);
+
+    fulfillModal.querySelector('#fulPickupBtn').addEventListener('click', function(){
+      state.type = 'pickup';
+      render();
+    });
+    fulfillModal.querySelector('#fulDeliveryBtn').addEventListener('click', function(){
+      state.type = 'delivery';
+      render();
+    });
+
+    if(state.type === 'delivery'){
+      fulfillModal.querySelector('#fulStreet').addEventListener('input', function(e){ state.address.street = e.target.value; });
+      fulfillModal.querySelector('#fulFloor').addEventListener('input', function(e){ state.address.floor = e.target.value; });
+      fulfillModal.querySelector('#fulNotes').addEventListener('input', function(e){ state.address.notes = e.target.value; });
+    }
+
+    fulfillModal.querySelector('#fulConfirmBtn').addEventListener('click', function(){
+      if(!state.type) return;
+      if(state.type === 'delivery' && !state.address.street.trim()){
+        var err = fulfillModal.querySelector('#fulError');
+        if(err) err.classList.add('show');
+        fulfillModal.querySelector('#fulStreet').focus();
+        return;
+      }
+      var msg = buildOrderMessage(state);
+      window.open('https://wa.me/5491172150777?text=' + encodeURIComponent(msg), '_blank');
+      CART = [];
+      saveCart();
+      renderCartBadge();
+      renderCartDrawer();
+      closeFulfillment();
+      closeCartDrawer();
+    });
+  }
+
+  render();
+  fulfillOverlay.classList.add('open');
+}
 
 loadCart();
 renderCartBadge();
