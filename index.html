@@ -811,6 +811,7 @@ nav.nav-solid .cart-badge { background: var(--bordo); color: var(--crema); }
 }
 .fulfill-field input:focus, .fulfill-field textarea:focus { outline: none; border-color: var(--bordo); }
 .fulfill-field textarea { resize: vertical; min-height: 52px; }
+.fulfill-note { color: var(--texto-suave); font-size: 0.78rem; line-height: 1.5; margin-bottom: 10px; }
 .fulfill-error { color: #b3261e; font-size: 0.76rem; margin-top: -4px; margin-bottom: 10px; display: none; }
 .fulfill-error.show { display: block; }
 .fulfill-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; gap: 12px; flex-wrap: wrap; }
@@ -1214,7 +1215,6 @@ Object.keys(DISHES).forEach(function(cat){
 });
 
 var CART = [];
-var DELIVERY_FEE = 3000;
 var STORE_ADDRESS = "Aráoz 2926, Palermo, Ciudad Autónoma de Buenos Aires";
 
 function loadCart(){
@@ -1411,14 +1411,14 @@ function buildOrderMessage(fulfillment){
     lines.push('Retiro en el local: ' + STORE_ADDRESS);
   } else if(fulfillment && fulfillment.type === 'delivery'){
     var addr = fulfillment.address || {};
-    lines.push('Envío a domicilio (+' + fmtPrice(DELIVERY_FEE) + ')');
+    lines.push('Envío a domicilio (costo adicional a confirmar con el local)');
     lines.push('Dirección: ' + addr.street);
     if(addr.floor) lines.push('Piso/Depto: ' + addr.floor);
     if(addr.notes) lines.push('Referencia: ' + addr.notes);
   }
   lines.push('');
 
-  var total = cartTotal() + (fulfillment && fulfillment.type === 'delivery' ? DELIVERY_FEE : 0);
+  var total = cartTotal();
   lines.push('Total: ' + fmtPrice(total));
   return lines.join('\n');
 }
@@ -1446,7 +1446,6 @@ function openFulfillment(){
   var state = { type: null, address: { street: '', floor: '', notes: '' } };
 
   function render(){
-    var deliveryTotal = cartTotal() + DELIVERY_FEE;
     var html = '';
     html += '<div class="fulfill-header"><h3>¿Cómo lo recibís?</h3><button class="fulfill-close" type="button" id="fulClose">&times;</button></div>';
     html += '<div class="fulfill-options">';
@@ -1455,7 +1454,7 @@ function openFulfillment(){
     html += '<div class="fopt-title">Retiro en el local</div><div class="fopt-sub">Sin cargo extra</div></button>';
     html += '<button type="button" class="fulfill-opt' + (state.type === 'delivery' ? ' active' : '') + '" id="fulDeliveryBtn">';
     html += '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v8H3zM14 10h4l3 3v2h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></svg>';
-    html += '<div class="fopt-title">Delivery</div><div class="fopt-sub">+' + fmtPrice(DELIVERY_FEE) + '</div></button>';
+    html += '<div class="fopt-title">Delivery</div><div class="fopt-sub">Costo a confirmar</div></button>';
     html += '</div>';
 
     html += '<div class="fulfill-detail" id="fulDetail">';
@@ -1465,11 +1464,12 @@ function openFulfillment(){
       html += '<div class="fulfill-field"><label>Dirección (calle y número)</label><input type="text" id="fulStreet" placeholder="Ej: Aráoz 2926" value="' + state.address.street + '"></div>';
       html += '<div class="fulfill-field"><label>Piso / Depto (opcional)</label><input type="text" id="fulFloor" placeholder="Ej: 4to B" value="' + state.address.floor + '"></div>';
       html += '<div class="fulfill-field"><label>Referencia (opcional)</label><textarea id="fulNotes" placeholder="Entre calles, timbre, etc.">' + state.address.notes + '</textarea></div>';
+      html += '<div class="fulfill-note">El costo del envío te lo confirmamos por WhatsApp según tu zona.</div>';
       html += '<div class="fulfill-error" id="fulError">Completá la dirección para continuar.</div>';
     }
     html += '</div>';
 
-    html += '<div class="fulfill-footer"><span class="fulfill-total" id="fulTotal">' + fmtPrice(state.type === 'delivery' ? deliveryTotal : cartTotal()) + '</span>';
+    html += '<div class="fulfill-footer"><span class="fulfill-total" id="fulTotal">' + fmtPrice(cartTotal()) + '</span>';
     html += '<button class="fulfill-confirm-btn" type="button" id="fulConfirmBtn"' + (state.type ? '' : ' disabled') + '>Confirmar pedido</button></div>';
 
     fulfillModal.innerHTML = html;
