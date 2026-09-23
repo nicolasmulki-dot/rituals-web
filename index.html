@@ -771,6 +771,8 @@ nav.nav-solid .cart-badge { background: var(--bordo); color: var(--crema); }
   letter-spacing: 0.5px; transition: background 0.15s ease, transform 0.15s ease;
 }
 .cust-add-btn:hover { background: var(--bordo-oscuro); transform: translateY(-2px); }
+.cust-add-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.cust-add-btn:disabled:hover { background: var(--bordo); }
 
 /* FULFILLMENT MODAL */
 .fulfill-modal {
@@ -1088,29 +1090,34 @@ nav.nav-solid .cart-badge { background: var(--bordo); color: var(--crema); }
 <script>
 var DISHES = {
   wraps: [
-    {name:"Rituals MC", img:"rituals-mc.jpg", price:17000, protein:"carne", desc:"Carne desmechada, queso, pepinillos, cebolla, salsa rituals proteica. Viene con chips de acompañamiento.", macros:{p:60,c:30,g:23,f:5,k:591}},
-    {name:"Chipa Wrap", img:"chipa-wrap.jpg", price:19500, protein:"pollo", desc:"Pollo, champiñones, cebolla, espinaca, cream cheese de verdeo. Viene con chips de acompañamiento.", macros:{p:51,c:76,g:20,f:3,k:688}},
-    {name:"Iron Beef", img:"iron-beef.jpg", price:17000, protein:"carne", desc:"Carne desmechada, vegetales salteados, dip de palta. Viene con chips de acompañamiento.", macros:{p:48,c:48,g:21,f:11,k:582}},
-    {name:"Big Cesar", img:"big-cesar.jpg", price:16000, protein:"pollo", desc:"Pollo, queso, almendras, aderezo césar proteico, croutons integrales, lechuga. Viene con chips de acompañamiento.", macros:{p:40,c:10,g:22,f:4,k:398}},
-    {name:"Vegan Power", img:"vegan-power.jpg", price:14000, veggie:true, desc:"Lentejas especiadas, hummus de garbanzos, tomate, espinaca, salsa criolla, nueces. Viene con chips de acompañamiento.", macros:{p:26,c:100,g:23,f:15,k:657}}
+    {name:"Rituals MC", img:"rituals-mc.jpg", price:18500, proteinChoice:["Carne desmechada","Pollo"], proteinKeys:["carne","pollo"], desc:"Carne desmechada o pollo, queso, pepinillos, cebolla, salsa rituals proteica", chips:["Queso","Pepinillos","Cebolla","Salsa rituals proteica"], note:"Viene con chips de acompañamiento.", macros:{p:60,c:36,g:23,f:5,k:591}},
+    {name:"Chipa Wrap", img:"chipa-wrap.jpg", price:21000, protein:"pollo", desc:"Pollo, champiñones, cebolla, espinaca, cream cheese de verdeo", note:"Viene con chips de acompañamiento.", macros:{p:51,c:76,g:20,f:3,k:688}},
+    {name:"Iron Beef", img:"iron-beef.jpg", price:18500, protein:"carne", desc:"Carne desmechada, vegetales salteados, dip de palta", note:"Viene con chips de acompañamiento.", macros:{p:48,c:48,g:21,f:11,k:582}},
+    {name:"Big Cesar", img:"big-cesar.jpg", price:17500, protein:"pollo", desc:"Pollo, queso, almendras, aderezo césar proteico, lechuga", note:"Viene con chips de acompañamiento.", macros:{p:40,c:10,g:22,f:4,k:398}},
+    {name:"Vegan Power", img:"vegan-power.jpg", price:16500, veggie:true, desc:"Lentejas especiadas, hummus de garbanzos, tomate, espinaca, salsa criolla, nueces", note:"Viene con chips de acompañamiento.", macros:{p:26,c:100,g:23,f:15,k:657}}
   ],
   woks: [
-    {name:"Criollo Umami", img:"criollo-umami.jpg", price:16000, protein:"carne", desc:"Roast beef, arroz yamaní, maní tostado, verduras salteadas, brotes de soja", macros:{p:54,c:66,g:24,f:12,k:694}},
-    {name:"Golden Chicken", img:"golden-chicken.jpg", price:15000, protein:"pollo", desc:"Pollo, arroz yamaní, maní tostado, verduras salteadas, brotes de soja", macros:{p:53,c:63,g:18,f:11,k:630}},
-    {name:"Asian Veggie", img:"asian-veggie.jpg", price:14000, desc:"Huevo, arroz yamaní, maní tostado, verduras salteadas, soja texturizada especiada", macros:{p:47,c:76,g:21,f:13,k:677}}
+    {name:"Criollo Umami", img:"criollo-umami.jpg", price:18000, protein:"carne", desc:"Roast beef, arroz yamaní, maní tostado, verduras salteadas, brotes de soja", macros:{p:54,c:66,g:24,f:12,k:694}},
+    {name:"Golden Chicken", img:"golden-chicken.jpg", price:17000, protein:"pollo", desc:"Pollo, arroz yamaní, maní tostado, verduras salteadas, brotes de soja", macros:{p:53,c:63,g:18,f:11,k:630}},
+    {name:"Asian Veggie", img:"asian-veggie.jpg", price:15000, desc:"Huevo, arroz yamaní, maní tostado, verduras salteadas, soja texturizada especiada", macros:{p:47,c:76,g:21,f:13,k:677}}
   ],
   ensaladas: [
-    {name:"César", img:"cesar.jpg", price:16000, protein:"pollo", desc:"Pollo, queso en hebras, almendras tostadas, aderezo césar proteico, croutons, lechuga", macros:{p:58,c:20,g:33,f:7,k:611}},
-    {name:"Rituals", img:"rituals-bowl.jpg", price:15000, protein:"pollo", desc:"Pollo, garbanzos crunchy, vegetales salteados, maní tostado, hojas verdes, cubos de calabaza", macros:{p:54,c:55,g:17,f:14,k:586}},
-    {name:"Bulk", img:"bulk.jpg", price:17000, protein:"carne", desc:"Carne desmechada, palta y cebolla, arroz yamaní, huevo, zanahoria, choclo, tomate y pepino", macros:{p:46,c:55,g:23,f:9.5,k:613}},
-    {name:"Green Protein", img:"green-protein.jpg", price:14000, veggie:true, desc:"Huevo, quinoa al pesto, queso, nueces tostadas, tomate, zanahoria, hojas verdes", macros:{p:26,c:35,g:42,f:10,k:630}}
+    {name:"César", img:"cesar.jpg", price:17000, protein:"pollo", desc:"Pollo, queso en hebras, almendras tostadas, aderezo césar proteico, croutons, lechuga", macros:{p:58,c:20,g:33,f:7,k:611}},
+    {name:"Rituals", img:"rituals-bowl.jpg", price:17000, protein:"pollo", desc:"Pollo, garbanzos crunchy, vegetales salteados, maní tostado, hojas verdes, cubos de calabaza", macros:{p:54,c:55,g:17,f:14,k:586}},
+    {name:"Bulk", img:"bulk.jpg", price:21000, protein:"carne", desc:"Carne desmechada, palta y cebolla, arroz yamaní, huevo, zanahoria, choclo, tomate y pepino", macros:{p:46,c:55,g:23,f:9.5,k:613}},
+    {name:"Green Protein", img:"green-protein.jpg", price:15000, veggie:true, desc:"Huevo, quinoa al pesto, queso, nueces tostadas, tomate, zanahoria, hojas verdes", macros:{p:26,c:35,g:42,f:10,k:630}}
   ],
   postres: [
-    {name:"Rituals Cheesecake", img:"cheesecake.jpg", macros:{p:14,c:21,g:11,k:240}}
+    {name:"Rituals Cheesecake", img:"cheesecake.jpg", price:7000, desc:"Cheesecake de dulce de leche proteico y más liviano", macros:{p:14,c:20,g:11,k:240}}
   ]
 };
 
 function fmtPrice(n){ return '$' + n.toLocaleString('es-AR'); }
+
+function fullDesc(d){
+  if (d.desc && d.note) return d.desc + '. ' + d.note;
+  return d.desc || d.note || '';
+}
 
 var EXTRAS = [
   {name:"Extra carne", price:4000, only:"carne"},
@@ -1125,7 +1132,8 @@ var EXTRAS = [
 ];
 
 function dishExtras(d){
-  return EXTRAS.filter(function(e){ return !e.only || e.only === d.protein; });
+  var proteins = d.proteinKeys || (d.protein ? [d.protein] : null);
+  return EXTRAS.filter(function(e){ return !e.only || (proteins && proteins.indexOf(e.only) !== -1); });
 }
 
 function buildCard(d){
@@ -1155,10 +1163,10 @@ function buildCard(d){
   name.className = 'dish-name';
   name.textContent = d.name;
   info.appendChild(name);
-  if (d.desc) {
+  if (d.desc || d.note) {
     var desc = document.createElement('div');
     desc.className = 'dish-desc';
-    desc.textContent = d.desc;
+    desc.textContent = fullDesc(d);
     info.appendChild(desc);
   }
   a.appendChild(info);
@@ -1248,12 +1256,13 @@ customizeOverlay.addEventListener('click', function(e){
 });
 
 function openCustomize(d){
-  var ingredients = d.desc ? d.desc.split(',').map(function(s){ return s.trim(); }) : [];
+  var ingredients = d.chips ? d.chips.slice() : (d.desc ? d.desc.split(',').map(function(s){ return s.trim(); }) : []);
   var extras = dishExtras(d);
   var state = {
     included: ingredients.map(function(){ return true; }),
     extras: extras.map(function(){ return false; }),
     spicyFree: false,
+    protein: null,
     qty: 1
   };
 
@@ -1268,6 +1277,14 @@ function openCustomize(d){
     html += '<div class="customize-header"><img src="' + d.img + '" alt="' + d.name + '">';
     html += '<div><h3>' + d.name + '</h3><div class="cust-price">' + fmtPrice(d.price) + '</div></div>';
     html += '<button class="customize-close" type="button" id="custClose">&times;</button></div>';
+
+    if(d.proteinChoice){
+      html += '<div class="cust-section-title">Elegí tu proteína (obligatorio)</div><div class="cust-chips" id="custProtein">';
+      d.proteinChoice.forEach(function(opt, i){
+        html += '<span class="cust-chip off" data-i="' + i + '">' + opt + '</span>';
+      });
+      html += '</div>';
+    }
 
     if(ingredients.length){
       html += '<div class="cust-section-title">Ingredientes · tocá para quitar</div><div class="cust-chips" id="custChips">';
@@ -1293,13 +1310,32 @@ function openCustomize(d){
 
     customizeModal.querySelector('#custClose').addEventListener('click', closeCustomize);
 
-    customizeModal.querySelectorAll('.cust-chip').forEach(function(chip){
+    function updateAddBtnState(){
+      var btn = customizeModal.querySelector('#custAddBtn');
+      if(!btn) return;
+      btn.disabled = !!d.proteinChoice && state.protein === null;
+    }
+
+    if(d.proteinChoice){
+      customizeModal.querySelectorAll('#custProtein .cust-chip').forEach(function(chip){
+        chip.addEventListener('click', function(){
+          state.protein = +chip.dataset.i;
+          customizeModal.querySelectorAll('#custProtein .cust-chip').forEach(function(c){ c.classList.add('off'); });
+          chip.classList.remove('off');
+          updateAddBtnState();
+        });
+      });
+    }
+
+    customizeModal.querySelectorAll('#custChips .cust-chip').forEach(function(chip){
       chip.addEventListener('click', function(){
         var i = +chip.dataset.i;
         state.included[i] = !state.included[i];
         chip.classList.toggle('off', !state.included[i]);
       });
     });
+
+    updateAddBtnState();
 
     customizeModal.querySelectorAll('#custExtras input[type=checkbox]').forEach(function(cb){
       cb.addEventListener('change', function(){
@@ -1327,10 +1363,12 @@ function openCustomize(d){
     });
 
     customizeModal.querySelector('#custAddBtn').addEventListener('click', function(){
+      if(d.proteinChoice && state.protein === null) return;
       var removed = ingredients.filter(function(ing, i){ return !state.included[i]; });
       var chosenExtras = extras.filter(function(e, i){ return state.extras[i]; });
+      var proteinLabel = d.proteinChoice ? d.proteinChoice[state.protein] : null;
       CART.push({
-        name: d.name,
+        name: d.name + (proteinLabel ? ' (' + proteinLabel + ')' : ''),
         img: d.img,
         basePrice: d.price,
         qty: state.qty,
