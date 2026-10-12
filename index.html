@@ -819,6 +819,17 @@ nav.nav-solid .cart-badge { background: var(--bordo); color: var(--crema); }
 .fulfill-note { color: var(--texto-suave); font-size: 0.78rem; line-height: 1.5; margin-bottom: 10px; }
 .fulfill-error { color: #b3261e; font-size: 0.76rem; margin-top: -4px; margin-bottom: 10px; display: none; }
 .fulfill-error.show { display: block; }
+.fulfill-calc-btn {
+  width: 100%; background: transparent; color: var(--bordo); border: 1.5px solid var(--bordo);
+  border-radius: 10px; padding: 11px; font-weight: 800; font-size: 0.78rem; text-transform: uppercase;
+  letter-spacing: 0.4px; margin-bottom: 10px; cursor: pointer; transition: background 0.15s ease;
+}
+.fulfill-calc-btn:hover { background: rgba(96,37,43,0.08); }
+.fulfill-delivery-status { font-size: 0.8rem; line-height: 1.5; margin-bottom: 10px; padding: 10px 12px; border-radius: 10px; }
+.fulfill-delivery-status.loading { color: var(--texto-suave); background: var(--crema-oscuro); }
+.fulfill-delivery-status.ok { color: #2f6b3a; background: rgba(79,138,90,0.12); font-weight: 700; }
+.fulfill-delivery-status.error { color: #b3261e; background: rgba(179,38,30,0.08); }
+.fulfill-manual-link { display: block; margin-top: 6px; background: none; border: none; color: var(--bordo); font-size: 0.74rem; text-decoration: underline; padding: 0; cursor: pointer; }
 .fulfill-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; gap: 12px; flex-wrap: wrap; }
 .fulfill-total { font-weight: 800; font-size: 1.05rem; color: var(--bordo); }
 .fulfill-confirm-btn {
@@ -1308,6 +1319,89 @@ Object.keys(DISHES).forEach(function(cat){
 
 var CART = [];
 var STORE_ADDRESS = "Aráoz 2926, Palermo, Ciudad Autónoma de Buenos Aires";
+var STORE_COORDS = [-58.425582, -34.592438]; // Aráoz, Palermo/Barrio Norte, CABA
+var ORS_API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjhiMGFjMGUyYjczMDQ4YmFhM2M0Yzc4NWRjNDg5YWY1IiwiaCI6Im11cm11cjY0In0=";
+var DELIVERY_BASE_PRICE = 3000;
+var DELIVERY_BASE_KM = 3;
+var DELIVERY_PRICE_PER_KM = 1000;
+var DELIVERY_MAX_PRICE = 7000;
+
+// Tope de envío distinto para barrios puntuales (sobreescribe el tope general de arriba).
+// Agregar/quitar barrios acá, el nombre tiene que matchear como lo devuelve el geocodificador (sin tildes, minúscula).
+var DELIVERY_ZONE_CAPS = {
+  'belgrano': 6000,
+  'nunez': 6000
+};
+
+function normalizeZoneName(s){
+  return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+}
+
+function rawDeliveryPrice(km){
+  if(km <= DELIVERY_BASE_KM) return DELIVERY_BASE_PRICE;
+  var extra = km - DELIVERY_BASE_KM;
+  return Math.round((DELIVERY_BASE_PRICE + extra * DELIVERY_PRICE_PER_KM) / 100) * 100;
+}
+
+function capForNeighbourhood(neighbourhood){
+  var key = normalizeZoneName(neighbourhood);
+  return (DELIVERY_ZONE_CAPS[key] != null) ? DELIVERY_ZONE_CAPS[key] : DELIVERY_MAX_PRICE;
+}
+
+function deliveryPriceForKm(km, maxPrice){
+  var cap = (maxPrice != null) ? maxPrice : DELIVERY_MAX_PRICE;
+  return Math.min(cap, rawDeliveryPrice(km));
+}
+
+function geocodeAddress(addressText){
+  var params = new URLSearchParams({
+    api_key: ORS_API_KEY,
+    text: addressText + ', Ciudad Autónoma de Buenos Aires, Argentina',
+    'boundary.country': 'AR',
+    size: '1',
+    'focus.point.lon': String(STORE_COORDS[0]),
+    'focus.point.lat': String(STORE_COORDS[1])
+  });
+  return fetch('https://api.openrouteservice.org/geocode/search?' + params.toString())
+    .then(function(res){
+      if(!res.ok) throw new Error('geocode_failed');
+      return res.json();
+    })
+    .then(function(data){
+      if(!data.features || !data.features.length) throw new Error('not_found');
+      var f = data.features[0];
+      return { coords: f.geometry.coordinates, neighbourhood: f.properties.neighbourhood || '' };
+    });
+}
+
+function drivingDistanceKm(destCoords){
+  return fetch('https://api.openrouteservice.org/v2/directions/driving-car', {
+    method: 'POST',
+    headers: { 'Authorization': ORS_API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ coordinates: [STORE_COORDS, destCoords] })
+  }).then(function(res){
+    if(!res.ok) throw new Error('route_failed');
+    return res.json();
+  }).then(function(data){
+    if(!data.routes || !data.routes[0]) throw new Error('route_failed');
+    return data.routes[0].summary.distance / 1000;
+  });
+}
+
+function calcDeliveryCost(addressText){
+  return geocodeAddress(addressText).then(function(geo){
+    return drivingDistanceKm(geo.coords).then(function(km){
+      if(km > 60) throw new Error('not_found');
+      var cap = capForNeighbourhood(geo.neighbourhood);
+      return {
+        km: km,
+        price: deliveryPriceForKm(km, cap),
+        capped: rawDeliveryPrice(km) > cap,
+        neighbourhood: geo.neighbourhood
+      };
+    });
+  });
+}
 
 function loadCart(){
   try{
@@ -1591,7 +1685,11 @@ function buildOrderMessage(fulfillment){
     lines.push(STORE_ADDRESS);
   } else if(fulfillment && fulfillment.type === 'delivery'){
     var addr = fulfillment.address || {};
-    lines.push('*Envío a domicilio* (costo a confirmar)');
+    if(fulfillment.deliveryStatus === 'ok' && fulfillment.deliveryPrice != null){
+      lines.push('*Envío a domicilio* (~' + fulfillment.deliveryKm.toFixed(1) + ' km)');
+    } else {
+      lines.push('*Envío a domicilio* (costo a confirmar)');
+    }
     var addrLine = addr.street;
     if(addr.floor) addrLine += ', ' + addr.floor;
     lines.push(addrLine);
@@ -1603,7 +1701,11 @@ function buildOrderMessage(fulfillment){
     lines.push('Subtotal: ' + fmtPrice(cartTotal()));
     lines.push('Descuento (' + appliedDiscount.code + ' -' + appliedDiscount.percent + '%): -' + fmtPrice(discountAmount()));
   }
-  var total = cartTotalFinal();
+  var deliveryCost = (fulfillment && fulfillment.type === 'delivery' && fulfillment.deliveryStatus === 'ok' && fulfillment.deliveryPrice != null) ? fulfillment.deliveryPrice : 0;
+  if(deliveryCost > 0){
+    lines.push('Envío: ' + fmtPrice(deliveryCost));
+  }
+  var total = cartTotalFinal() + deliveryCost;
   lines.push('*Total: ' + fmtPrice(total) + '*');
   return lines.join('\n');
 }
@@ -1665,7 +1767,15 @@ fulfillOverlay.addEventListener('click', function(e){
 });
 
 function openFulfillment(){
-  var state = { type: null, address: { street: '', floor: '', notes: '' } };
+  var state = {
+    type: null,
+    address: { street: '', floor: '', notes: '' },
+    deliveryStatus: 'idle', // idle | loading | ok | error | manual
+    deliveryKm: null,
+    deliveryPrice: null,
+    deliveryCapped: false,
+    deliveryError: ''
+  };
 
   function render(){
     var html = '';
@@ -1676,7 +1786,7 @@ function openFulfillment(){
     html += '<div class="fopt-title">Retiro en el local</div><div class="fopt-sub">Sin cargo extra</div></button>';
     html += '<button type="button" class="fulfill-opt' + (state.type === 'delivery' ? ' active' : '') + '" id="fulDeliveryBtn">';
     html += '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v8H3zM14 10h4l3 3v2h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></svg>';
-    html += '<div class="fopt-title">Delivery</div><div class="fopt-sub">Costo a confirmar</div></button>';
+    html += '<div class="fopt-title">Delivery</div><div class="fopt-sub">Según tu zona</div></button>';
     html += '</div>';
 
     html += '<div class="fulfill-detail" id="fulDetail">';
@@ -1686,13 +1796,29 @@ function openFulfillment(){
       html += '<div class="fulfill-field"><label>Dirección (calle y número)</label><input type="text" id="fulStreet" placeholder="Ej: Aráoz 2926" value="' + state.address.street + '"></div>';
       html += '<div class="fulfill-field"><label>Piso / Depto (opcional)</label><input type="text" id="fulFloor" placeholder="Ej: 4to B" value="' + state.address.floor + '"></div>';
       html += '<div class="fulfill-field"><label>Referencia (opcional)</label><textarea id="fulNotes" placeholder="Entre calles, timbre, etc.">' + state.address.notes + '</textarea></div>';
-      html += '<div class="fulfill-note">El costo del envío te lo confirmamos por WhatsApp según tu zona.</div>';
+
+      if(state.deliveryStatus === 'idle'){
+        html += '<button type="button" class="fulfill-calc-btn" id="fulCalcBtn">Calcular costo de envío</button>';
+      } else if(state.deliveryStatus === 'loading'){
+        html += '<div class="fulfill-delivery-status loading">Calculando distancia...</div>';
+      } else if(state.deliveryStatus === 'ok'){
+        html += '<div class="fulfill-delivery-status ok">Envío: ' + fmtPrice(state.deliveryPrice) + ' (' + state.deliveryKm.toFixed(1) + ' km desde el local)' + (state.deliveryCapped ? ' — tarifa máxima' : '') + '</div>';
+        html += '<button type="button" class="fulfill-calc-btn" id="fulCalcBtn">Recalcular</button>';
+      } else if(state.deliveryStatus === 'error'){
+        html += '<div class="fulfill-delivery-status error">' + state.deliveryError + '<button type="button" class="fulfill-manual-link" id="fulManualBtn">Continuar sin calcular (confirmamos el envío por WhatsApp)</button></div>';
+        html += '<button type="button" class="fulfill-calc-btn" id="fulCalcBtn">Reintentar</button>';
+      } else if(state.deliveryStatus === 'manual'){
+        html += '<div class="fulfill-delivery-status loading">El costo del envío te lo confirmamos por WhatsApp según tu zona.</div>';
+      }
+
       html += '<div class="fulfill-error" id="fulError">Completá la dirección para continuar.</div>';
     }
     html += '</div>';
 
-    html += '<div class="fulfill-footer"><span class="fulfill-total" id="fulTotal">' + fmtPrice(cartTotalFinal()) + '</span>';
-    html += '<button class="fulfill-confirm-btn" type="button" id="fulConfirmBtn"' + (state.type ? '' : ' disabled') + '>Confirmar pedido</button></div>';
+    var footerExtra = (state.type === 'delivery' && state.deliveryStatus === 'ok') ? state.deliveryPrice : 0;
+    var confirmDisabled = !state.type || (state.type === 'delivery' && state.deliveryStatus !== 'ok' && state.deliveryStatus !== 'manual');
+    html += '<div class="fulfill-footer"><span class="fulfill-total" id="fulTotal">' + fmtPrice(cartTotalFinal() + footerExtra) + '</span>';
+    html += '<button class="fulfill-confirm-btn" type="button" id="fulConfirmBtn"' + (confirmDisabled ? ' disabled' : '') + '>Confirmar pedido</button></div>';
 
     fulfillModal.innerHTML = html;
 
@@ -1708,9 +1834,50 @@ function openFulfillment(){
     });
 
     if(state.type === 'delivery'){
-      fulfillModal.querySelector('#fulStreet').addEventListener('input', function(e){ state.address.street = e.target.value; });
+      fulfillModal.querySelector('#fulStreet').addEventListener('input', function(e){
+        state.address.street = e.target.value;
+        if(state.deliveryStatus !== 'idle'){
+          state.deliveryStatus = 'idle';
+          state.deliveryKm = null;
+          state.deliveryPrice = null;
+          render();
+        }
+      });
       fulfillModal.querySelector('#fulFloor').addEventListener('input', function(e){ state.address.floor = e.target.value; });
       fulfillModal.querySelector('#fulNotes').addEventListener('input', function(e){ state.address.notes = e.target.value; });
+
+      var calcBtn = fulfillModal.querySelector('#fulCalcBtn');
+      if(calcBtn){
+        calcBtn.addEventListener('click', function(){
+          var street = (state.address.street || '').trim();
+          if(!street){
+            var err = fulfillModal.querySelector('#fulError');
+            if(err) err.classList.add('show');
+            fulfillModal.querySelector('#fulStreet').focus();
+            return;
+          }
+          state.deliveryStatus = 'loading';
+          render();
+          calcDeliveryCost(street).then(function(result){
+            state.deliveryStatus = 'ok';
+            state.deliveryKm = result.km;
+            state.deliveryPrice = result.price;
+            state.deliveryCapped = result.capped;
+            render();
+          }).catch(function(){
+            state.deliveryStatus = 'error';
+            state.deliveryError = 'No pudimos calcular el envío para esa dirección. Revisala e intentá de nuevo.';
+            render();
+          });
+        });
+      }
+      var manualBtn = fulfillModal.querySelector('#fulManualBtn');
+      if(manualBtn){
+        manualBtn.addEventListener('click', function(){
+          state.deliveryStatus = 'manual';
+          render();
+        });
+      }
     }
 
     fulfillModal.querySelector('#fulConfirmBtn').addEventListener('click', function(){
@@ -1721,6 +1888,7 @@ function openFulfillment(){
         fulfillModal.querySelector('#fulStreet').focus();
         return;
       }
+      if(state.type === 'delivery' && state.deliveryStatus !== 'ok' && state.deliveryStatus !== 'manual') return;
       var msg = buildOrderMessage(state);
       window.open('https://wa.me/5491172150777?text=' + encodeURIComponent(msg), '_blank');
       CART = [];
