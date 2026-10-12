@@ -1319,7 +1319,7 @@ Object.keys(DISHES).forEach(function(cat){
 
 var CART = [];
 var STORE_ADDRESS = "Aráoz 2926, Palermo, Ciudad Autónoma de Buenos Aires";
-var STORE_COORDS = [-58.425582, -34.592438]; // Aráoz, Palermo/Barrio Norte, CABA
+var STORE_COORDS = [-58.4111615, -34.5829538]; // Aráoz 2926, Palermo, CABA (verificado por geocoding a nivel de puerta)
 var ORS_API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjhiMGFjMGUyYjczMDQ4YmFhM2M0Yzc4NWRjNDg5YWY1IiwiaCI6Im11cm11cjY0In0=";
 var DELIVERY_BASE_PRICE = 3000;
 var DELIVERY_BASE_KM = 3;
@@ -1353,24 +1353,35 @@ function deliveryPriceForKm(km, maxPrice){
   return Math.min(cap, rawDeliveryPrice(km));
 }
 
+// Geocoding por Nominatim (OpenStreetMap): da precisión a nivel de puerta en calles chicas de CABA,
+// algo que el geocoder de OpenRouteService no siempre tiene para direcciones fuera de avenidas grandes.
+var CABA_VIEWBOX = '-58.5315,-34.5265,-58.3350,-34.7051'; // acota la búsqueda a CABA (evita matchear calles homónimas lejanas)
+
 function geocodeAddress(addressText){
   var params = new URLSearchParams({
-    api_key: ORS_API_KEY,
-    text: addressText + ', Ciudad Autónoma de Buenos Aires, Argentina',
-    'boundary.country': 'AR',
-    size: '1',
-    'focus.point.lon': String(STORE_COORDS[0]),
-    'focus.point.lat': String(STORE_COORDS[1])
+    q: addressText + ', Ciudad Autónoma de Buenos Aires, Argentina',
+    format: 'jsonv2',
+    addressdetails: '1',
+    countrycodes: 'ar',
+    limit: '1',
+    viewbox: CABA_VIEWBOX,
+    bounded: '1'
   });
-  return fetch('https://api.openrouteservice.org/geocode/search?' + params.toString())
+  return fetch('https://nominatim.openstreetmap.org/search?' + params.toString(), {
+    headers: { 'Accept-Language': 'es' }
+  })
     .then(function(res){
       if(!res.ok) throw new Error('geocode_failed');
       return res.json();
     })
     .then(function(data){
-      if(!data.features || !data.features.length) throw new Error('not_found');
-      var f = data.features[0];
-      return { coords: f.geometry.coordinates, neighbourhood: f.properties.neighbourhood || '' };
+      if(!data || !data.length) throw new Error('not_found');
+      var f = data[0];
+      var addr = f.address || {};
+      return {
+        coords: [parseFloat(f.lon), parseFloat(f.lat)],
+        neighbourhood: addr.suburb || addr.neighbourhood || addr.city_district || ''
+      };
     });
 }
 
