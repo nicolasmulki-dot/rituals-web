@@ -524,6 +524,23 @@ p.section-sub {
   opacity: 0.75;
 }
 .dish-order-hint svg { width: 12px; height: 12px; vertical-align: -1px; margin-left: 3px; }
+.dish-card.sold-out { cursor: default; }
+.dish-card.sold-out:hover { transform: none; box-shadow: 0 4px 18px rgba(96,37,43,0.14); }
+.dish-card.sold-out img { filter: grayscale(1); opacity: 0.5; }
+.sold-out-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--bordo);
+  color: var(--crema);
+  font-weight: 800;
+  font-size: 0.62rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+.dish-card.sold-out .dish-order-hint { opacity: 0.45; }
 
 /* SIN FOTO (postres / bebidas) */
 .simple-list .plato {
@@ -539,6 +556,8 @@ p.section-sub {
 .simple-list .plato-precio { font-weight: 800; color: var(--bordo); white-space: nowrap; }
 .simple-list .plato-clickable { cursor: pointer; transition: opacity 0.15s ease; }
 .simple-list .plato-clickable:hover { opacity: 0.7; }
+.simple-list .sold-out { opacity: 0.5; }
+.simple-list .sold-out .plato-precio { color: var(--texto-suave); font-weight: 700; text-transform: uppercase; font-size: 0.72rem; }
 
 /* CTA / CONTACTO */
 .cta {
@@ -1135,7 +1154,7 @@ nav.nav-solid .cart-badge { background: var(--bordo); color: var(--crema); }
 var DISHES = {
   wraps: [
     {name:"Rituals MC", img:"rituals-mc.jpg", price:18500, proteinChoice:["Carne desmechada","Pollo"], proteinKeys:["carne","pollo"], desc:"Carne desmechada o pollo, queso, pepinillos, cebolla, salsa rituals proteica", chips:["Queso","Pepinillos","Cebolla","Salsa rituals proteica"], note:"Viene con chips de acompañamiento.", macros:{p:60,c:36,g:23,f:5,k:591}},
-    {name:"Chipa Wrap", img:"chipa-wrap.jpg", price:21000,soldOut:true, protein:"pollo", desc:"Pollo, champiñones, cebolla, espinaca, cream cheese de verdeo", note:"Viene con chips de acompañamiento.", macros:{p:51,c:76,g:20,f:3,k:688}},
+    {name:"Chipa Wrap", img:"chipa-wrap.jpg", price:21000, protein:"pollo", soldOut:true, desc:"Pollo, champiñones, cebolla, espinaca, cream cheese de verdeo", note:"Viene con chips de acompañamiento.", macros:{p:51,c:76,g:20,f:3,k:688}},
     {name:"Iron Beef", img:"iron-beef.jpg", price:18500, protein:"carne", desc:"Carne desmechada, vegetales salteados, dip de palta", note:"Viene con chips de acompañamiento.", macros:{p:48,c:48,g:21,f:11,k:582}},
     {name:"Big Cesar", img:"big-cesar.jpg", price:17500, protein:"pollo", desc:"Pollo, queso, almendras, aderezo césar proteico, lechuga", note:"Viene con chips de acompañamiento.", macros:{p:40,c:10,g:22,f:4,k:398}},
     {name:"Vegan Power", img:"vegan-power.jpg", price:16500, veggie:true, desc:"Lentejas especiadas, hummus de garbanzos, tomate, espinaca, salsa criolla, nueces", note:"Viene con chips de acompañamiento.", macros:{p:26,c:100,g:23,f:15,k:657}}
@@ -1188,17 +1207,20 @@ var BEBIDAS = [
 
 function buildBebidaRow(b){
   var row = document.createElement('div');
-  row.className = 'plato plato-clickable';
-  row.setAttribute('role', 'button');
-  row.tabIndex = 0;
+  row.className = 'plato' + (b.soldOut ? ' sold-out' : ' plato-clickable');
+  if (!b.soldOut){
+    row.setAttribute('role', 'button');
+    row.tabIndex = 0;
+  }
   var name = document.createElement('span');
   name.className = 'plato-nombre';
   name.textContent = b.name;
   var price = document.createElement('span');
   price.className = 'plato-precio';
-  price.textContent = fmtPrice(b.price);
+  price.textContent = b.soldOut ? 'Agotado' : fmtPrice(b.price);
   row.appendChild(name);
   row.appendChild(price);
+  if (b.soldOut) return row;
   function addBebida(){
     CART.push({
       name: b.name,
@@ -1234,9 +1256,11 @@ function dishExtras(d){
 function buildCard(d){
   var hasPrice = typeof d.price === 'number';
   var a = document.createElement('div');
-  a.className = 'dish-card';
-  a.setAttribute('role', 'button');
-  a.tabIndex = 0;
+  a.className = 'dish-card' + (d.soldOut ? ' sold-out' : '');
+  if (!d.soldOut){
+    a.setAttribute('role', 'button');
+    a.tabIndex = 0;
+  }
 
   var photoWrap = document.createElement('div');
   photoWrap.className = 'dish-photo-wrap';
@@ -1249,6 +1273,12 @@ function buildCard(d){
     vp.className = 'veggie-pill';
     vp.textContent = 'Opción veggie';
     photoWrap.appendChild(vp);
+  }
+  if (d.soldOut){
+    var sb = document.createElement('span');
+    sb.className = 'sold-out-badge';
+    sb.textContent = 'Agotado';
+    photoWrap.appendChild(sb);
   }
   a.appendChild(photoWrap);
 
@@ -1293,7 +1323,9 @@ function buildCard(d){
 
   var hint = document.createElement('div');
   hint.className = 'dish-order-hint';
-  if (hasPrice){
+  if (d.soldOut){
+    hint.textContent = 'No disponible por hoy';
+  } else if (hasPrice){
     hint.innerHTML = 'Personalizar y agregar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
     a.addEventListener('click', function(){ openCustomize(d); });
     a.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openCustomize(d); } });
